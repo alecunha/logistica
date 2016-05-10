@@ -60,11 +60,11 @@
 			<artifactId>hibernate-validator</artifactId>
 			<version>5.2.3.Final</version>
 	    </dependency>
-		<dependency>
+	<!-- 	<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-c3p0</artifactId>
 			<version>5.0.7.Final</version>
-		</dependency>
+		</dependency> -->
 						
 				
 		<dependency>

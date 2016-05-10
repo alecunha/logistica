@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -17,17 +19,23 @@ public class RouteEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
 	
 	@OneToOne
+	@JoinColumn(name="source_spot_id", nullable=false, updatable=false)
 	private SpotEntity source;
 	
 	@OneToOne
+	@JoinColumn(name="destination_spot_id", nullable=false, updatable=false)
 	private SpotEntity destination;
 	
 	@Column(nullable=false)
 	private int weight;
+	
+	@ManyToOne
+	@JoinColumn(name="map_id", nullable=false)
+	private MapEntity map;
 
 	public Long getId() {
 		return id;
@@ -59,5 +67,13 @@ public class RouteEntity implements Serializable {
 
 	public void setWeight(int weight) {
 		this.weight = weight;
+	}
+	
+	public MapEntity getMap() {
+		return map;
+	}
+
+	public void setMap(MapEntity map) {
+		this.map = map;
 	}
 }

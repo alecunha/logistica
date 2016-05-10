@@ -3,8 +3,11 @@ package com.walmart.repository.entity;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -16,15 +19,14 @@ public class MapEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
 	
 	@Column(unique=true, nullable=false)
 	private String name;
 	
-	@OneToMany
-	private List<SpotEntity> path;
-	
-	private int dintace;
+	@OneToMany(mappedBy="map", cascade=CascadeType.ALL)
+	private List<RouteEntity> routes;
 
 	public Long getId() {
 		return id;
@@ -42,19 +44,11 @@ public class MapEntity implements Serializable {
 		this.name = name;
 	}
 
-	public List<SpotEntity> getPath() {
-		return path;
+	public List<RouteEntity> getRoutes() {
+		return routes;
 	}
 
-	public void setPath(List<SpotEntity> path) {
-		this.path = path;
-	}
-	
-	public int getDintace() {
-		return dintace;
-	}
-
-	public void setDintace(int dintace) {
-		this.dintace = dintace;
+	public void setRoutes(List<RouteEntity> routes) {
+		this.routes = routes;
 	}
 }

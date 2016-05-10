@@ -2,6 +2,7 @@ package com.walmart.repository.config;
 
 import java.util.Properties;
 
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -19,9 +20,13 @@ import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.jndi.JndiTemplate;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
+import org.springframework.orm.jpa.JpaDialect;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.orm.jpa.LocalEntityManagerFactoryBean;
+import org.springframework.orm.jpa.vendor.Database;
+import org.springframework.orm.jpa.vendor.HibernateJpaDialect;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -61,42 +66,46 @@ public class RepositoryConfiguration extends JndiTemplate {
 	}
 	
 	@Bean
-	@DependsOn("entityManagerFactory")
-	public PlatformTransactionManager transactionManager(LocalContainerEntityManagerFactoryBean entityManagerFactory) {
-	    return new JpaTransactionManager(entityManagerFactory.getNativeEntityManagerFactory());
-	}
-
-	@Bean
-	public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
-		LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
-		em.setDataSource(dataSource());
-		em.setPackagesToScan(new String[] { "com.walmart.repository" });
-
-		JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
-		em.setJpaVendorAdapter(vendorAdapter);
-		em.setJpaProperties(additionalProperties());
-
-		return em;
-	}
-	
+    @Autowired
+	@DependsOn("dataSource")
+    public EntityManagerFactory entityManagerFactory(DataSource dataSource) {
+        HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
+        vendorAdapter.setGenerateDdl(true);
+        vendorAdapter.setShowSql(false);
+        vendorAdapter.setDatabasePlatform("org.hibernate.dialect.H2Dialect");
+        vendorAdapter.setDatabase(Database.H2);
+ 
+        LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
+        factory.setJpaVendorAdapter(vendorAdapter);
+        factory.setPackagesToScan("com.walmart.repository");
+        factory.setDataSource(dataSource);
+ 
+        factory.setJpaProperties(additionalProperties());
+ 
+        factory.afterPropertiesSet();
+ 
+        return factory.getObject();
+    }
+ 
+    @Bean
+    @Autowired
+    @DependsOn("entityManagerFactory")
+    public JpaTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
+        JpaTransactionManager txManager = new JpaTransactionManager();
+        JpaDialect jpaDialect = new HibernateJpaDialect();
+        txManager.setEntityManagerFactory(entityManagerFactory);
+        txManager.setJpaDialect(jpaDialect);
+        return txManager;
+    }
+    
 	private Properties additionalProperties() {
 
 		final Properties hibernateProperties = new Properties();
 		hibernateProperties.put("hibernate.cache.region.factory_class", "org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory");
 		hibernateProperties.put("hibernate.cache.use_query_cache", "true");
 		hibernateProperties.put("hibernate.cache.use_second_level_cache", "true");
-
-		hibernateProperties.put("hibernate.c3p0.min_size", "5");
-		hibernateProperties.put("hibernate.c3p0.max_size", "20");
-		hibernateProperties.put("hibernate.c3p0.timeout", "36000");
-		hibernateProperties.put("hibernate.c3p0.max_statements", "50");
-		hibernateProperties.put("hibernate.c3p0.idle_test_period", "7200");
 		hibernateProperties.put("hibernate.hbm2ddl.auto", "update");
-		
-		hibernateProperties.put("hibernate.show_sql", "true");
-		hibernateProperties.put("hibernate.format_sql", "true");
 		hibernateProperties.put("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
-		//hibernateProperties.put("hibernate.dialect", "org.hibernate.dialect.DerbyDialect");
 
 		return hibernateProperties;
 	}
