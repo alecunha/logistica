@@ -2,10 +2,7 @@ package com.walmart.webservice.controller;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Scanner;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -20,9 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.walmart.service.api.CostService;
 import com.walmart.service.api.MapService;
 import com.walmart.service.api.PathService;
-import com.walmart.service.api.RouteService;
-import com.walmart.service.api.SpotService;
-import com.walmart.service.model.Route;
 import com.walmart.service.model.Spot;
 import com.walmart.service.util.Util;
 

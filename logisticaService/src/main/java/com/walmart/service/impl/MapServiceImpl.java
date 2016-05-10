@@ -38,7 +38,10 @@ public class MapServiceImpl implements MapService {
 			
 			
 			//LER O ARQUIVO
-			Scanner scanner = new Scanner(inputStream, "UTF-8").useDelimiter(System.lineSeparator());
+			Scanner scanner = new Scanner(inputStream, "UTF-8");
+			scanner.useDelimiter(System.lineSeparator());
+			scanner.close();
+			
 			List<Route> routes = new ArrayList<Route>();
 			Long id = new Long(0);
 			while (scanner.hasNext()) {
@@ -53,7 +56,6 @@ public class MapServiceImpl implements MapService {
 				routes.add(route);
 				
 			}
-			//scanner.close();
 	
 			routeService.save(routes, mapEntity);
 			
